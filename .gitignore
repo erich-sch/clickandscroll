@@ -1,0 +1,9 @@
+# only track coffeescript files; ignore compiled javascript
+*.js
+
+# use these directories to quickly experiment or test something
+test/
+tmp/
+
+# directory containing final webextension (javacript files, manifest.json, ...)
+clickandscroll/
