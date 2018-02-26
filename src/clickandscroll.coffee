@@ -2,13 +2,18 @@ log = (msg) ->
     console.log "clickandscroll: " + msg
 
 # preferences
+# enable vertical scrolling
 vertical = true
+# enable horizontal scrolling
 horizontal = true
-multiplicatorY = 1
-multiplicatorX = 1
+# maximum time in milliseconds between two successive clicks for a double click 
+dblclick_threshold = 200
 
+# global variables
+multiplicatorX = multiplicatorY = 1
 initX = initY = 0
 scrollLock = false
+lastTime = 0
 
 # helper functions
 pageHeight = ->
@@ -38,7 +43,15 @@ scroll = (e) ->
 
 document.addEventListener "contextmenu", (e) ->
     console.log e.type
-    e.preventDefault()
+    log "lastTime: " + lastTime
+    if Date.now() - lastTime >= dblclick_threshold
+        # it's the first click
+        e.preventDefault()
+        lastTime = Date.now()
+    else
+        # it's the second click
+        return
+
     unless scrollLock
         scrollLock = true
 
