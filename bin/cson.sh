@@ -1,6 +1,5 @@
 #!/bin/sh
 # Recursively convert cson files to json
-# TODO: add --watch option
 
 # parse options
 echo -n $1 | grep -e '-w' -e '--watch'
