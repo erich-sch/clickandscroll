@@ -1,19 +1,7 @@
 log = (msg) ->
     console.log "clickandscroll: " + msg
 
-# preferences
-# enable vertical scrolling
-vertical = true
-# enable horizontal scrolling
-horizontal = true
-# maximum time in milliseconds between two successive clicks for a double click 
-dblclick_threshold = 200
-
-# global variables
-multiplicatorX = multiplicatorY = 1
-initX = initY = 0
-scrollLock = false
-lastTime = 0
+log "up and running"
 
 # helper functions
 pageHeight = ->
@@ -28,8 +16,36 @@ viewHeight = ->
 viewWidth = ->
     Math.max document.documentElement.clientWidth, window.innerWidth or 0
 
-# eventhandler for mousemove
-scroll = (e) ->
+# mouse button constants
+mouseLeft = 0
+mouseMiddle = 1
+mouseRight = 2
+
+# preferences
+# enable vertical scrolling
+vertical = true
+# enable horizontal scrolling
+horizontal = true
+# maximum time in milliseconds between two successive clicks for a double click 
+dblclick_threshold = 200
+scrollTrigger = mouseRight
+
+# global variables
+multiplicatorX = multiplicatorY = 1
+initX = initY = 0
+scrollLock = false
+lastTime = 0
+contextLock = true if scrollTrigger is mouseRight
+
+onmouseup = (e) ->
+    if e.button isnt scrollTrigger
+        return
+
+    scrollLock = false
+    document.removeEventListener "mousemove", onmousemove
+    return
+
+onmousemove = (e) ->
     unless vertical
         initY = e.pageY
     unless horizontal
@@ -41,15 +57,17 @@ scroll = (e) ->
     initX = e.pageX
     return
 
-document.addEventListener "contextmenu", (e) ->
-    console.log e.type
-    log "lastTime: " + lastTime
+onmousedown = (e) ->
+    if e.button isnt scrollTrigger
+        return
+
     if Date.now() - lastTime >= dblclick_threshold
         # it's the first click
         e.preventDefault()
-        lastTime = Date.now()
+        if e.type is "contextmenu" or scrollTrigger isnt mouseRight
+            lastTime = Date.now()
     else
-        # it's the second click
+        contextLock = false
         return
 
     unless scrollLock
@@ -58,28 +76,25 @@ document.addEventListener "contextmenu", (e) ->
         initX = e.pageX
         initY = e.pageY
 
-        log "mouse position on page: " + initX + "x" + initY
+        # log "mouse position on page: " + initX + "x" + initY
 
         vWidth = viewWidth()
         vHeight = viewHeight()
         pWidth = pageWidth()
         pHeight = pageHeight()
 
-        log "viewport: " + vWidth + "x" + vHeight
-        log "page: " + pWidth + "x" + pHeight
+        # log "viewport: " + vWidth + "x" + vHeight
+        # log "page: " + pWidth + "x" + pHeight
 
         multiplicatorX = pWidth / vWidth
         multiplicatorY = pHeight / vHeight
 
-        log "multiplicatorX: " + multiplicatorX
-        log "multiplicatorY: " + multiplicatorY
+        # log "multiplicatorX: " + multiplicatorX
+        # log "multiplicatorY: " + multiplicatorY
 
-        document.addEventListener "mousemove", scroll
+        document.addEventListener "mousemove", onmousemove
     return
 
-document.addEventListener "mouseup", (e) ->
-    console.log e.type
-    if e.button isnt 2 then return
-    scrollLock = false
-    document.removeEventListener "mousemove", scroll
-    return
+document.addEventListener "mousedown", onmousedown
+document.addEventListener "contextmenu", onmousedown
+document.addEventListener "mouseup", onmouseup
