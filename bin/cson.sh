@@ -3,7 +3,7 @@
 # TODO: add --watch option
 
 # parse options
-# echo -n $1 | grep -e '-w' -e '--watch'
+echo -n $1 | grep -e '-w' -e '--watch'
 if [ $? -eq 0 ]
 then
     watch=:
