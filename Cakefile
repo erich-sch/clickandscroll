@@ -11,3 +11,6 @@ task 'build', ->
 task 'watch', ->
     spawn 'coffee', ['--output', dst, '--watch', '--compile', src], {stdio: 'inherit'}
     spawn 'bin/cson.sh', ['--watch', src, dst], {stdio: 'inherit'}
+
+task 'clean', ->
+    spawn 'rm', ['-r', dst]
